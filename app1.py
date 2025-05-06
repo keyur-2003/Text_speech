@@ -10,7 +10,7 @@ import tempfile
 
 # Set up Google API Key (Replace with your actual Gemini API key)
 
-genai_api_key = st.secrets["GENAI_API_KEY"]
+genai_api_key = st.secrets["GOOGLE_API_KEY"]
 genai.configure(api_key=genai_api_key)
 model = genai.GenerativeModel('gemini-2.0-flash')
 
