@@ -9,7 +9,6 @@ import speech_recognition as sr
 import tempfile
 
 # Set up Google API Key (Replace with your actual Gemini API key)
-
 genai_api_key = st.secrets["GOOGLE_API_KEY"]
 genai.configure(api_key=genai_api_key)
 model = genai.GenerativeModel('gemini-2.0-flash')
@@ -84,14 +83,13 @@ def combine_audio(speech_audio, music_audio, music_volume_adjust=-20):
     combined = speech_audio.overlay(music_audio)
     return combined.export(format="mp3").read()
 
-# ✅ Updated: Convert speech (MP3/WAV) to text with proper conversion
+# Convert uploaded speech to text
 def speech_to_text(uploaded_file):
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=uploaded_file.name) as tmp:
             tmp.write(uploaded_file.read())
             tmp_path = tmp.name
 
-        # Convert to proper WAV format
         audio = AudioSegment.from_file(tmp_path)
         wav_path = tmp_path + ".wav"
         audio.export(wav_path, format="wav")
@@ -117,12 +115,24 @@ tab1, tab2 = st.tabs(["🔊 Text to Speech", "🎙️ Speech to Text"])
 # Tab 1: Text to Speech
 with tab1:
     user_text = st.text_area("Enter your text here:")
+
+    # Language selection dropdown
+    languages = {
+        "English": "en",
+        "Hindi": "hi",
+        "Gujarati": "gu",
+        "French": "fr",
+        "Japanese": "ja"
+    }
+    selected_language = st.selectbox("Select language for speech:", list(languages.keys()))
+    language_code = languages[selected_language]
+
     add_music = st.checkbox("Add simple background music?")
 
     if st.button("Generate Audio"):
         if user_text:
             with st.spinner("Generating speech..."):
-                speech_audio = text_to_speech(user_text)
+                speech_audio = text_to_speech(user_text, language=language_code)
 
             if isinstance(speech_audio, AudioSegment):
                 music_audio = AudioSegment.silent(duration=0)
